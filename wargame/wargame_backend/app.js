@@ -225,27 +225,33 @@ app.post('/armazentamento/arquivo', (req, res) => {
 
     const query = 'INSERT INTO tbl_armazenamento_arquivos (nome_arquivo, conteudo_arquivo) VALUES (?, ?)';
 
+//Correcao stored code injection
     fs.appendFile(fileName, conteudo_arquivo, (err) => {
         if (err) {
             console.error('Erro ao escrever o arquivo:', err);
             return res.status(500).send('Erro ao escrever o arquivo');
         }
-
+    
         fs.readFile(`../wargame_back_end/${fileName}`, (err, fileContent) => {
             if (err) {
                 console.error('Erro ao ler o arquivo:', err);
                 return res.status(500).send('Erro ao ler o arquivo');
             }
-
-            
+    
             try {
-                eval(fileContent);
-        
+                // Aqui, você pode processar o conteúdo do arquivo de forma segura
+                // sem usar eval. Por exemplo, se você espera que o conteúdo seja
+                // JavaScript, você pode simplesmente enviá-lo como uma resposta.
                 res.writeHead(200, {'Content-Type': 'text/xml'});
                 res.write(fileContent);
-        
+    
                 console.log('O que está dentro do conteúdo: ' + fileContent);
-        
+    
+                // No entanto, se você precisa executar algum código específico
+                // do arquivo, você pode considerar outras abordagens mais seguras
+                // como módulos do Node.js ou funções específicas definidas pelo
+                // seu sistema.
+                
                 db.query(query, [nome_arquivo, fileContent], (err, result) => {
                     if (err) {
                         console.error('Erro ao tentar inserir dados:', err);
