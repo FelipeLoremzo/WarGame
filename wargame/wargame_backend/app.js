@@ -231,8 +231,11 @@ app.post('/armazentamento/arquivo', (req, res) => {
             console.error('Erro ao escrever o arquivo:', err);
             return res.status(500).send('Erro ao escrever o arquivo');
         }
-    
-        fs.readFile(`../wargame_back_end/${fileName}`, (err, fileContent) => {
+        //Correção XSS Amanda
+        const encodedFileName = encodeURIComponent(fileName);
+        const encodedFileContent = encodeURIComponent(fileContent);
+ 
+        fs.readFile(`../wargame_back_end/${encodedFileName}`, (err, encodedFileContent) => {
             if (err) {
                 console.error('Erro ao ler o arquivo:', err);
                 return res.status(500).send('Erro ao ler o arquivo');
@@ -243,7 +246,7 @@ app.post('/armazentamento/arquivo', (req, res) => {
                 // sem usar eval. Por exemplo, se você espera que o conteúdo seja
                 // JavaScript, você pode simplesmente enviá-lo como uma resposta.
                 res.writeHead(200, {'Content-Type': 'text/xml'});
-                res.write(fileContent);
+                res.write(encodedFileContent);
     
                 console.log('O que está dentro do conteúdo: ' + fileContent);
     
@@ -252,7 +255,7 @@ app.post('/armazentamento/arquivo', (req, res) => {
                 // como módulos do Node.js ou funções específicas definidas pelo
                 // seu sistema.
                 
-                db.query(query, [nome_arquivo, fileContent], (err, result) => {
+                db.query(query, [nome_arquivo, encodedFileContent], (err, result) => {
                     if (err) {
                         console.error('Erro ao tentar inserir dados:', err);
                     } else {
